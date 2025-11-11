@@ -6,13 +6,9 @@ from watchdog.events import FileSystemEventHandler
 
 from ultralytics import YOLO
 import cv2
-# import requests <-- HAPUS INI
-
-# --- IMPORT FILE UTILS & SERVICE BARU ---
 from utils.in_out import get_plate_crop
 from utils.img_proc import get_plate_string
-from services.api_client import send_plate # <-- IMPORT FUNGSI BARU
-# ----------------------------------------
+from services.api_client import send_plate 
 
 PATH_WATCH_IN = os.path.join("images", "in")
 PATH_WATCH_OUT = os.path.join("images", "out")
@@ -25,9 +21,6 @@ SUBDIR_OCR = "ocr"
 PATH_MODELS = "models"
 MODEL_DETECTION_PATH = os.path.join(PATH_MODELS, "detection.pt")
 MODEL_OCR_PATH = os.path.join(PATH_MODELS, "plate_number.pt")
-
-# --- HAPUS SEMUA KONFIGURASI API_URL DARI SINI ---
-
 
 class MyEventHandler(FileSystemEventHandler):
     
@@ -49,7 +42,7 @@ class MyEventHandler(FileSystemEventHandler):
 
         base_filename = os.path.basename(file_path)
         
-        source_subdir = "" # Akan menjadi "in" atau "out"
+        source_subdir = "" 
         
         abs_file_path = os.path.abspath(file_path)
 
@@ -67,17 +60,14 @@ class MyEventHandler(FileSystemEventHandler):
         dynamic_proc_path = os.path.join(PATH_OUTPUT_BASE, source_subdir, SUBDIR_IMG_PROC)
         dynamic_ocr_path = os.path.join(PATH_OUTPUT_BASE, source_subdir, SUBDIR_OCR)
 
-        # TAHAP 1: DETEKSI & CROP PLAT
         plate_crop_image = get_plate_crop(file_path, self.model_deteksi)
         if plate_crop_image is None:
             return
 
-        # TAHAP 2: SIMPAN CROP
         save_path = os.path.join(dynamic_crop_path, f"crop_{base_filename}")
         cv2.imwrite(save_path, plate_crop_image)
         print(f"[INFO] Crop plat disimpan ke: {save_path}")
         
-        # TAHAP 3: BACA STRING
         plate_string = get_plate_string(
             crop_image_path=save_path, 
             model_ocr=self.model_ocr,
@@ -88,17 +78,9 @@ class MyEventHandler(FileSystemEventHandler):
         if not plate_string:
             return
             
-        # --- TAHAP 4: KIRIM STRING (JAUH LEBIH BERSIH) ---
-        # Panggil fungsi dari api_client.py
         send_plate(plate_string, source_subdir)
-        # ---------------------------------------------
-
-    # --- HAPUS SELURUH FUNGSI 'send_string_to_service' DARI SINI ---
-
 
 def main():
-    # (Fungsi main() tidak berubah, 
-    #  semua kode pengecekan folder dan load model tetap sama)
     
     if not os.path.exists(PATH_WATCH_IN) or not os.path.exists(PATH_WATCH_OUT):
         print("Error: Folder 'images/in' dan 'images/out' tidak ditemukan.")

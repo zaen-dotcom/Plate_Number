@@ -1,10 +1,7 @@
-# database.py
-
 from sqlmodel import Field, SQLModel, create_engine, Session
 from typing import Optional
 from datetime import datetime
 
-# Mengganti nama model dari ParkingLog -> PlateLog
 class PlateLog(SQLModel, table=True):
     """
     Model yang mendefinisikan tabel 'platelog'.
@@ -14,9 +11,8 @@ class PlateLog(SQLModel, table=True):
     plate_number: str = Field(index=True)
     time_in: datetime = Field(default_factory=datetime.now)
     time_out: Optional[datetime] = Field(default=None)
-    status: str = Field(default="in") # Status: "in" atau "out"
+    status: str = Field(default="in") 
 
-# Nama file database tetap (bisa diubah jika mau)
 sqlite_file_name = "plate.db"
 sqlite_url = f"sqlite:///{sqlite_file_name}"
 

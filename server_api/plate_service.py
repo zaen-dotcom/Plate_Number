@@ -1,10 +1,7 @@
-# plate_service.py
-
 from sqlmodel import Session, select
 from datetime import datetime
 from fastapi import HTTPException, status
 
-# Import model tabel PlateLog baru
 from database import PlateLog
 
 def register_vehicle_in(db: Session, plate_number: str) -> PlateLog:
@@ -43,9 +40,8 @@ def register_vehicle_out(db: Session, plate_number: str) -> PlateLog | None:
     """
     plate_number = plate_number.strip().upper()
     if not plate_number:
-        return None # Kasus Gagal 1
+        return None 
 
-    # Cari data 'in' menggunakan PlateLog
     log_to_update = db.exec(
         select(PlateLog).where(
             PlateLog.plate_number == plate_number,
@@ -54,16 +50,12 @@ def register_vehicle_out(db: Session, plate_number: str) -> PlateLog | None:
     ).first()
     
     if not log_to_update:
-        # --- PERUBAHAN UTAMA ---
-        # JANGAN TAMPILKAN ERROR, tapi kembalikan None
-        return None # Kasus Gagal 2: Tidak ditemukan
-        # -----------------------
+        return None 
         
-    # Kasus Sukses: Update data
     log_to_update.time_out = datetime.now()
     log_to_update.status = "out"
     db.add(log_to_update)
     db.commit()
     db.refresh(log_to_update)
     
-    return log_to_update # Kembalikan data log jika sukses
+    return log_to_update 

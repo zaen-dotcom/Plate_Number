@@ -1,5 +1,3 @@
-# plate_router.py
-
 from fastapi import APIRouter, Depends
 from sqlmodel import Session
 from pydantic import BaseModel
@@ -45,20 +43,14 @@ async def api_vehicle_out(
     MENGEMBALIKAN JSON TRUE/FALSE.
     """
     
-    # Panggil service (sekarang bisa mengembalikan 'None')
     log = plate_service.register_vehicle_out(db, payload.plate_number)
-    
-    # --- PERUBAHAN UTAMA DI SINI ---
     if log:
-        # Jika 'log' BUKAN None (Sukses), kirim True
         return {
             "status": True,
             "message": "Kendaraan diizinkan keluar."
         }
     else:
-        # Jika 'log' ADALAH None (Gagal), kirim False
         return {
             "status": False,
             "message": "Plat tidak ditemukan atau sudah keluar."
         }
-    # ---------------------------------
